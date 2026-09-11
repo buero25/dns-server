@@ -51,6 +51,37 @@ Vite-Proxy zu `http://localhost:3000` an.
 > Admin-Rechte können `DNS_UDP_PORT` / `DNS_TCP_PORT` (z.B. auf 5300) bzw. `DHCP_SERVER_PORT`
 > in der `.env` auf einen Port > 1024 gesetzt werden.
 
+## Vorgefertigtes Docker-Image
+
+Bei jedem Push auf `main` baut die [Docker-Workflow](.github/workflows/docker.yml) das
+Server-Image automatisch und veröffentlicht es öffentlich auf GitHub Container Registry:
+
+```bash
+docker pull ghcr.io/buero25/dns-server-app:latest
+```
+
+Das Image enthält nur den `app`-Service (Server + gebautes Admin-UI); für PostgreSQL wird
+weiterhin ein separater Container benötigt. Schneller lokaler Test ohne `docker compose`:
+
+```bash
+docker network create dns-test
+
+docker run -d --name dns-postgres --network dns-test \
+  -e POSTGRES_USER=dns_admin -e POSTGRES_PASSWORD=changeme -e POSTGRES_DB=dns_server \
+  postgres:16-alpine
+
+docker run -d --name dns-app --network dns-test \
+  -e DATABASE_URL="postgresql://dns_admin:changeme@dns-postgres:5432/dns_server" \
+  -e SESSION_SECRET="$(openssl rand -hex 32)" \
+  -e ADMIN_DEFAULT_USERNAME=admin -e ADMIN_DEFAULT_PASSWORD=changeme \
+  -p 53:53/udp -p 53:53/tcp -p 67:67/udp -p 3000:3000/tcp \
+  ghcr.io/buero25/dns-server-app:latest
+```
+
+Für den produktiven Einsatz (mit `docker compose`, Migrationen, DHCP-Host-Networking etc.)
+siehe die folgenden Abschnitte — dort baut `docker compose up -d --build` das Image bei Bedarf
+auch lokal aus dem Quellcode.
+
 ## Produktions-Deployment (Docker, Linux-VPS)
 
 ```bash
