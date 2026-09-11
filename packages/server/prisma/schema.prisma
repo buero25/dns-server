@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model Zone {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  soaSerial   Int      @default(1)
+  soaRefresh  Int      @default(3600)
+  soaRetry    Int      @default(600)
+  soaExpire   Int      @default(604800)
+  soaMinTtl   Int      @default(300)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  records     Record[]
+}
+
+enum RecordType {
+  A
+  AAAA
+  CNAME
+  MX
+  TXT
+  NS
+  PTR
+  SRV
+}
+
+model Record {
+  id        String     @id @default(uuid())
+  zoneId    String
+  zone      Zone       @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  name      String
+  type      RecordType
+  value     String
+  ttl       Int        @default(3600)
+  priority  Int?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([zoneId, name, type])
+}
+
+model Upstream {
+  id      String @id @default(uuid())
+  address String
+  port    Int    @default(53)
+  order   Int    @default(0)
+}
+
+model DhcpPool {
+  id           String             @id @default(uuid())
+  name         String
+  iface        String
+  subnet       String
+  rangeStart   String
+  rangeEnd     String
+  gateway      String
+  dnsServers   String[]
+  leaseSeconds Int                @default(86400)
+  enabled      Boolean            @default(true)
+  createdAt    DateTime           @default(now())
+  reservations DhcpReservation[]
+  leases       DhcpLease[]
+}
+
+model DhcpReservation {
+  id         String   @id @default(uuid())
+  poolId     String
+  pool       DhcpPool @relation(fields: [poolId], references: [id], onDelete: Cascade)
+  macAddress String
+  ip         String
+  hostname   String?
+
+  @@unique([poolId, macAddress])
+}
+
+model DhcpLease {
+  id         String   @id @default(uuid())
+  poolId     String
+  pool       DhcpPool @relation(fields: [poolId], references: [id], onDelete: Cascade)
+  macAddress String
+  ip         String
+  hostname   String?
+  expiresAt  DateTime
+
+  @@unique([poolId, ip])
+  @@index([macAddress])
+}
+
+enum QuerySource {
+  AUTHORITATIVE
+  CACHE
+  FORWARDED
+  NXDOMAIN
+}
+
+model QueryLog {
+  id           String      @id @default(uuid())
+  timestamp    DateTime    @default(now())
+  queryName    String
+  queryType    String
+  clientIp     String
+  responseCode String
+  source       QuerySource
+
+  @@index([timestamp])
+}

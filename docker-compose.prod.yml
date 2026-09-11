@@ -1,0 +1,13 @@
+# Produktions-Overlay: nutzt Host-Networking, damit DHCP-Broadcasts (Port 67/udp)
+# zuverlässig das physische LAN erreichen. DNS (Port 53) und die Admin-API
+# (Port 3000) laufen dann ebenfalls direkt auf den Host-Ports.
+#
+# Verwendung:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+services:
+  app:
+    network_mode: host
+    ports: !reset []
+    environment:
+      DNS_BIND_ADDRESS: 0.0.0.0
+      DHCP_BIND_ADDRESS: 0.0.0.0

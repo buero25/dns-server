@@ -1,0 +1,25 @@
+{
+  "name": "dns-server-project",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "packages/server",
+    "packages/admin-ui"
+  ],
+  "scripts": {
+    "dev:server": "npm run dev -w packages/server",
+    "dev:ui": "npm run dev -w packages/admin-ui",
+    "build": "npm run build -w packages/admin-ui && npm run build -w packages/server",
+    "start": "npm run start -w packages/server",
+    "prisma:generate": "npm run prisma:generate -w packages/server",
+    "prisma:migrate": "npm run prisma:migrate -w packages/server"
+  },
+  "allowScripts": {
+    "@prisma/client@5.22.0": true,
+    "@prisma/engines@5.22.0": true,
+    "bcrypt@5.1.1": true,
+    "esbuild@0.28.2": true,
+    "esbuild@0.21.5": true,
+    "prisma@5.22.0": true
+  }
+}
