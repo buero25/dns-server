@@ -1,5 +1,7 @@
 # DNS-Server mit Web-Admin-Panel
 
+[![GitHub Repo](https://img.shields.io/badge/GitHub-buero25%2Fdns--server-181717?logo=github)](https://github.com/buero25/dns-server)
+
 Ein selbst gehosteter DNS-Server (autoritativ + rekursiver Forwarder mit Cache) inklusive
 DHCP-Server und webbasierter Admin-Oberfläche zur Konfiguration von Zonen, DNS-Records,
 DHCP-Pools/Reservierungen und Upstream-Servern.
