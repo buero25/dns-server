@@ -17,12 +17,26 @@ export async function findAuthoritativeZone(qname: string) {
   return null;
 }
 
+/**
+ * Converts an absolute query name into the zone-relative record name used in
+ * storage (e.g. "www.test.local" + zone "test.local" -> "www", and the zone
+ * apex itself -> "@").
+ */
+export function toRelativeName(qname: string, zoneName: string): string {
+  const name = qname.toLowerCase().replace(/\.$/, '');
+  const zone = zoneName.toLowerCase().replace(/\.$/, '');
+  if (name === zone) return '@';
+  if (name.endsWith(`.${zone}`)) return name.slice(0, -(zone.length + 1));
+  return name;
+}
+
 export async function findRecords(
   zoneId: string,
+  zoneName: string,
   qname: string,
   qtype: string
 ): Promise<DbRecord[]> {
-  const name = qname.toLowerCase().replace(/\.$/, '');
+  const name = toRelativeName(qname, zoneName);
   return prisma.record.findMany({
     where: {
       zoneId,
@@ -32,7 +46,11 @@ export async function findRecords(
   });
 }
 
-export async function resolveCname(zoneId: string, qname: string): Promise<DbRecord | null> {
-  const name = qname.toLowerCase().replace(/\.$/, '');
+export async function resolveCname(
+  zoneId: string,
+  zoneName: string,
+  qname: string
+): Promise<DbRecord | null> {
+  const name = toRelativeName(qname, zoneName);
   return prisma.record.findFirst({ where: { zoneId, name, type: 'CNAME' } });
 }

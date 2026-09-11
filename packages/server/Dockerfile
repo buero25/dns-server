@@ -1,4 +1,5 @@
 FROM node:20-alpine AS build
+RUN apk add --no-cache openssl
 WORKDIR /repo
 
 COPY package.json ./
@@ -14,6 +15,7 @@ RUN npx prisma generate --schema packages/server/prisma/schema.prisma
 RUN npm run build -w packages/server
 
 FROM node:20-alpine
+RUN apk add --no-cache openssl
 WORKDIR /app
 ENV NODE_ENV=production
 

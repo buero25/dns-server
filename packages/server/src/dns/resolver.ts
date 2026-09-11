@@ -54,21 +54,21 @@ export async function resolveQuestion(qname: string, qtype: string): Promise<Res
   const zone = await findAuthoritativeZone(qname);
 
   if (zone) {
-    const records = await findRecords(zone.id, qname, qtype);
+    const records = await findRecords(zone.id, zone.name, qname, qtype);
 
     if (records.length > 0) {
       return {
-        answers: records.map((r) => toAnswer(r.name, r.type, r.value, r.ttl, r.priority)),
+        answers: records.map((r) => toAnswer(qname, r.type, r.value, r.ttl, r.priority)),
         source: 'AUTHORITATIVE',
         authoritative: true,
       };
     }
 
     if (qtype !== 'CNAME') {
-      const cname = await resolveCname(zone.id, qname);
+      const cname = await resolveCname(zone.id, zone.name, qname);
       if (cname) {
         return {
-          answers: [toAnswer(cname.name, 'CNAME', cname.value, cname.ttl)],
+          answers: [toAnswer(qname, 'CNAME', cname.value, cname.ttl)],
           source: 'AUTHORITATIVE',
           authoritative: true,
         };
