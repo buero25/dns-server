@@ -2,6 +2,7 @@
 
 [![GitHub Repo](https://img.shields.io/badge/GitHub-buero25%2Fdns--server-181717?logo=github)](https://github.com/buero25/dns-server)
 [![CI](https://github.com/buero25/dns-server/actions/workflows/ci.yml/badge.svg)](https://github.com/buero25/dns-server/actions/workflows/ci.yml)
+[![Docker](https://github.com/buero25/dns-server/actions/workflows/docker.yml/badge.svg)](https://github.com/buero25/dns-server/actions/workflows/docker.yml)
 [![Stars](https://img.shields.io/github/stars/buero25/dns-server?style=social)](https://github.com/buero25/dns-server/stargazers)
 [![Forks](https://img.shields.io/github/forks/buero25/dns-server?style=social)](https://github.com/buero25/dns-server/forks)
 [![License](https://img.shields.io/github/license/buero25/dns-server)](LICENSE)
